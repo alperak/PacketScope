@@ -5,12 +5,15 @@
 #include <vector>
 #include <time.h>
 #include <cstdint>
+
 #include <RawPacket.h>
 
 /**
  * @file Types.hpp
  * @brief Core data structures for packet capture pipeline.
  */
+
+namespace packetscope {
 
 /**
  * @brief Raw captured packet data.
@@ -31,4 +34,6 @@ struct DeviceInfo {
     std::string name;
     std::string description;
 };
+
+}
 #endif

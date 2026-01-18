@@ -17,7 +17,7 @@
  */
 class PacketCapture {
 public:
-    using CaptureCallback = std::function<void(RawPacketData)>;
+    using CaptureCallback = std::function<void(packetscope::RawPacketData)>;
 
     PacketCapture() = default;
     ~PacketCapture();
@@ -30,7 +30,7 @@ public:
      * @brief List available live capture devices.
      * @return A vector of DeviceInfo containing device name and description.
      */
-    std::vector<DeviceInfo> listAvailableDevices() const;
+    std::vector<packetscope::DeviceInfo> listAvailableDevices() const;
 
     /**
      * @brief Starts asynchronous packet capture on the given network interface.

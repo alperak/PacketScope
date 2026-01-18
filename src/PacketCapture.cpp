@@ -6,14 +6,14 @@ PacketCapture::~PacketCapture() {
     stop();
 }
 
-std::vector<DeviceInfo> PacketCapture::listAvailableDevices() const {
+std::vector<packetscope::DeviceInfo> PacketCapture::listAvailableDevices() const {
     const auto& devicesList = pcpp::PcapLiveDeviceList::getInstance().getPcapLiveDevicesList();
 
-    std::vector<DeviceInfo> devices;
+    std::vector<packetscope::DeviceInfo> devices;
     devices.reserve(devicesList.size());
 
     for (const auto* device : devicesList)
-        devices.emplace_back(DeviceInfo{device->getName(), device->getDesc()});
+        devices.emplace_back(packetscope::DeviceInfo{device->getName(), device->getDesc()});
 
     return devices;
 }
@@ -78,7 +78,7 @@ void PacketCapture::onPacketArrives(pcpp::RawPacket* packet, pcpp::PcapLiveDevic
         return;
     }
 
-    RawPacketData rawPacketData;
+    packetscope::RawPacketData rawPacketData;
 
     rawPacketData.timestamp = packet->getPacketTimeStamp();
     rawPacketData.frameLength = packet->getFrameLength();
