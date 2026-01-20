@@ -80,6 +80,21 @@ public:
         return value;
     }
 
+    /**
+     * @brief Returns the current number of elemens in the queue.
+     *
+     * The result is only accurate, if no other thread modifies the queue.
+     * Therefore it is rarely practical to use this value in program logic.
+     * Intended for monitoring and diagnostic purposes only.
+     * It shouldn't be used as a decider.
+     *
+     * @return std::size_t
+     */
+    std::size_t size() const {
+        std::lock_guard<std::mutex> lock(mutex_);
+        return queue_.size();
+    }
+
 private:
 
     std::queue<T> queue_;
