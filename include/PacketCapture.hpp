@@ -61,6 +61,11 @@ public:
      */
     bool isRunning() const;
 
+    /**
+     * @brief Returns total captured packet count since start.
+     */
+    std::size_t getCapturedPacketCount() const;
+
 private:
     /**
      * @brief Internal callback invoked by PcapPlusPlus for each captured packet.
@@ -71,6 +76,7 @@ private:
     pcpp::PcapLiveDevice* device_{nullptr};
     std::atomic<bool> isRunning_{false};
     CaptureCallback callback_;
+    std::atomic<std::size_t> capturedPacketCount_{};
 };
 
 #endif

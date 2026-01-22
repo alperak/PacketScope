@@ -78,6 +78,8 @@ void PacketCapture::onPacketArrives(pcpp::RawPacket* packet, pcpp::PcapLiveDevic
         return;
     }
 
+    self->capturedPacketCount_++;
+
     packetscope::RawPacketData rawPacketData;
 
     rawPacketData.timestamp = packet->getPacketTimeStamp();
@@ -91,4 +93,10 @@ void PacketCapture::onPacketArrives(pcpp::RawPacket* packet, pcpp::PcapLiveDevic
     self->callback_(std::move(rawPacketData));
 }
 
-bool PacketCapture::isRunning() const { return isRunning_; }
+bool PacketCapture::isRunning() const {
+    return isRunning_;
+}
+
+std::size_t PacketCapture::getCapturedPacketCount() const {
+    return capturedPacketCount_;
+}
