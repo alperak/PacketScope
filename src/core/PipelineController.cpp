@@ -1,4 +1,4 @@
-#include "PipelineController.hpp"
+#include "core/PipelineController.hpp"
 
 PipelineController::PipelineController()
     : packetStore_(std::make_shared<PacketStore>())
