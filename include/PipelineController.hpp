@@ -75,6 +75,12 @@ public:
     std::size_t queueSize() const;
 
     /**
+     * @brief Returns total captured packet count since start
+     * @return Number of packets captured since start
+     */
+    std::size_t capturedCount() const;
+
+    /**
      * @brief Returns total processed packet count.
      * @return Number of packets in store
      */

@@ -78,6 +78,9 @@ std::size_t PipelineController::queueSize() const {
     return rawPacketQueue_.size();
 }
 
+std::size_t PipelineController::capturedCount() const {
+    return packetCapture_->getCapturedPacketCount();
+}
 std::size_t PipelineController::processedCount() const {
     return packetStore_->count();
 }
