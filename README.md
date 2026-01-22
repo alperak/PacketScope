@@ -27,10 +27,12 @@ Before started to build you must edit `CMakeLists.txt` and set the correct Qt pa
 
     ```mkdir build && cd build && cmake ..-DCMAKE_BUILD_TYPE=DEBUG && make```
   
-    Optional: If you want to enable sanitizers for debugging, you can simply add:
-      `-DENABLE_ASAN=ON` or `-DENABLE_TSAN=ON`
+    Optional: If you want to enable sanitizers for debugging, you can simply add
+      `-DENABLE_ASAN=ON` or `-DENABLE_TSAN=ON`  
+    Optional: If you want to build documentation you might be consider to enable
+     `-DBUILD_DOCS=ON`
 
-5) Run
+6) Run
 
     ```sudo ./packet-scope```
 
