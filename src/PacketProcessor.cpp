@@ -38,7 +38,8 @@ packetscope::ParsedPacket PacketProcessor::process(const packetscope::RawPacketD
         // Update protocol only if it's not a generic payload.
         // GenericPayload means "unrecognized data after the last known protocol".
         // We want to display the last recognized protocol, not "Unknown".
-        if (layer->getProtocol() != pcpp::GenericPayload) {
+        if (layer->getProtocol() != pcpp::GenericPayload && layer->getProtocol() != pcpp::UnknownProtocol
+            && layer->getProtocol() != pcpp::PacketTrailer) {
             // Protocol is updated for each layer. The last (highest) layer's 
             // protocol becomes the displayed protocol.
             // This matches Wireshark's behavior:
