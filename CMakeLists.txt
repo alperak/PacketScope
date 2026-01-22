@@ -108,12 +108,29 @@ target_link_libraries(packet-scope
         Threads::Threads
 )
 
+# Doxygen Documentation
+option(BUILD_DOCS "Build Doxygen documentation" OFF)
+find_package(Doxygen QUIET)
+if(BUILD_DOCS AND DOXYGEN_FOUND)
+    add_custom_target(doc_doxygen ALL
+        COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMENT "Generating API documentation with Doxygen"
+        VERBATIM
+    )
+elseif(NOT BUILD_DOCS)
+    message(STATUS "BUILD_DOCS is OFF.")
+else()
+    message(STATUS "Doxygen not found. Documentation target will not be available.")
+endif()
+
 # Build summary
 message(STATUS "")
 message(STATUS "========= PacketScope Build Configuration =========")
 message(STATUS "Build type        : ${CMAKE_BUILD_TYPE}")
 message(STATUS "C++ standard      : C++${CMAKE_CXX_STANDARD}")
 message(STATUS "Compiler          : ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
+message(STATUS "Docs enabled      : ${BUILD_DOCS}")
 message(STATUS "ASAN enabled      : ${ENABLE_ASAN}")
 message(STATUS "TSAN enabled      : ${ENABLE_TSAN}")
 
