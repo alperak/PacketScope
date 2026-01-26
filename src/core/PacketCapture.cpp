@@ -1,6 +1,6 @@
 #include "core/PacketCapture.hpp"
 
-#include <iostream>
+#include <spdlog/spdlog.h>
 
 PacketCapture::~PacketCapture() {
     stop();
@@ -20,24 +20,24 @@ std::vector<packetscope::DeviceInfo> PacketCapture::listAvailableDevices() const
 
 bool PacketCapture::start(const std::string& deviceName, CaptureCallback callback) {
     if (!callback) {
-        std::cout << "PacketCapture::start() - Callback is empty.\n";
+        spdlog::error("PacketCapture::start() - Callback is empty");
         return false;
     }
     // If already running, don't start
     if (isRunning_) {
-        std::cout << "PacketCapture::start() - called while already running!\n";
+        spdlog::warn("PacketCapture::start() - Already running");
         return false;
     }
 
     device_ = pcpp::PcapLiveDeviceList::getInstance().getDeviceByName(deviceName);
 
     if (!device_) {
-        std::cout << "PacketCapture::start() - The device isn't exist.\n";
+        spdlog::error("PacketCapture::start() - Device '{}' doesn't exist", deviceName);
         return false;
     }
 
     if (!device_->open()) {
-        std::cout << "PacketCapture::start() - The device couldn't be opened.\n";
+        spdlog::error("PacketCapture::start() - Device '{}' cannot be opened", deviceName);
         return false;
     }
 
@@ -50,18 +50,23 @@ bool PacketCapture::start(const std::string& deviceName, CaptureCallback callbac
      *  - Capture thread could not be created
      */
     if (!device_->startCapture(onPacketArrives, this)) {
-        std::cout << "PacketCapture::start() - Capture couldn't be started.\n";
+        spdlog::error("PacketCapture::start() - Capture failed to start on '{}'", deviceName);
         device_->close();
         return false;
     }
 
     isRunning_ = true;
+    spdlog::info("PacketCapture::start() - Packet capture started successfully on '{}'", deviceName);
     return true;
 }
 
 void PacketCapture::stop() {
-    if (!isRunning_)
+    if (!isRunning_) {
+        // Already stopped
         return;
+    }
+
+    spdlog::debug("PacketCapture::stop() - Stopping packet capture");
 
     if (device_) {
         device_->stopCapture();
@@ -69,6 +74,7 @@ void PacketCapture::stop() {
     }
 
     isRunning_ = false;
+    spdlog::debug("PacketCapture::stop() - Packet capture stopped");
 }
 
 void PacketCapture::onPacketArrives(pcpp::RawPacket* packet, pcpp::PcapLiveDevice* dev, void* cookie) {
