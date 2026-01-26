@@ -6,6 +6,8 @@
 #include "ThreadPool.hpp"
 #include "PacketProcessor.hpp"
 
+#include <mutex>
+
 /**
  * @brief Coordinates the entire packet processing pipeline.
  *
@@ -116,6 +118,9 @@ private:
 
     // PipelineController state flag
     std::atomic<bool> isRunning_{false};
+
+    // Mutex for start/stop coordination
+    std::mutex controlMutex_;
 
     // Worker thread count
     static constexpr std::size_t kWorkerCount = 2;
