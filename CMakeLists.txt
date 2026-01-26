@@ -28,6 +28,7 @@ set(CMAKE_PREFIX_PATH "/opt/Qt/6.10.1/gcc_64")
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
 find_package(Threads REQUIRED)
 find_package(PcapPlusPlus REQUIRED)
+find_package(spdlog REQUIRED)
 
 # Sources
 set(SOURCES
@@ -106,6 +107,7 @@ target_link_libraries(packet-scope
         Qt6::Widgets
         PcapPlusPlus::Pcap++
         Threads::Threads
+        spdlog::spdlog
 )
 
 # Doxygen Documentation
