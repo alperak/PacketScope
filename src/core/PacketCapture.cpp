@@ -71,6 +71,7 @@ void PacketCapture::stop() {
     if (device_) {
         device_->stopCapture();
         device_->close();
+        device_ = nullptr;
     }
 
     isRunning_ = false;
