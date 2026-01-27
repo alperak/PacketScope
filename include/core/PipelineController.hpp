@@ -49,6 +49,14 @@ public:
     void stop();
 
     /**
+     * @brief Restarts the pipeline on the current device.
+     *
+     * Clears all stored packets and statistics, then starts
+     * fresh capture on the same device.
+     */
+    bool restart();
+
+    /**
      * @brief Checks if pipeline is currently running.
      * @return true if running, false otherwise
      */
@@ -122,6 +130,9 @@ private:
 
     // Worker thread count
     static constexpr std::size_t kWorkerCount = 2;
+
+    // Current device name (for restart)
+    std::string currentDeviceName_;
 };
 
 #endif
