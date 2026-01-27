@@ -58,7 +58,7 @@ bool PipelineController::start(const std::string& deviceName) {
                 }
 
                 // Submit parsing task to thread pool
-                threadPool_->submit([this, raw = std::move(*rawPacket)]() mutable {
+                threadPool_->submit([this, raw = std::move(*rawPacket)]() {
                     packetscope::ParsedPacket parsedPacket = packetProcessor_.process(raw);
                     packetStore_->addPacket(std::move(parsedPacket));
                 });
@@ -159,7 +159,7 @@ bool PipelineController::restart() {
                     break;
                 }
 
-                threadPool_->submit([this, raw = std::move(*rawPacket)]() mutable {
+                threadPool_->submit([this, raw = std::move(*rawPacket)]() {
                     packetscope::ParsedPacket parsedPacket = packetProcessor_.process(raw);
                     packetStore_->addPacket(std::move(parsedPacket));
                 });
