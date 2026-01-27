@@ -96,6 +96,14 @@ public:
         joinAll();
     }
 
+    /**
+     * @brief Checks if the thread pool has been shut down.
+     * @return true if shutdown() was called, false otherwise
+     */
+    bool isStopped() const {
+        return stopped_;
+    }
+
 private:
 
     /**
