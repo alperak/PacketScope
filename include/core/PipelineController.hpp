@@ -25,28 +25,26 @@ public:
     PipelineController& operator=(PipelineController&&) = delete;
 
     /**
-     * @brief Starts the capture pipeline on the specified device.
+     * @brief Starts or resumes the capture pipeline.
      *
-     * This function can be called only once during the lifetime
-     * of PipelineController. Restarting after stop() isn't supported
-     * at the moment.
+     * If called after stop(), resumes capture on the specified device.
+     * Existing packets in store are preserved.
      *
-     * @param deviceName Network device name ("eth0", "wlan0", etc.)
+     * @param deviceName Network device name (eth0, wlan0, etc.)
      */
     bool start(const std::string& deviceName);
 
     /**
-     * @brief Stops the capture pipeline gracefully.
+     * @brief Pauses the capture pipeline.
+     *
+     * Stops capturing new packets. Existing packets remain in store.
+     * Can be resumed with start().
      *
      * Shutdown sequence:
      *  Stop packet capture (no new packets produced)
      *  Push poison pill (std::nullopt) to raw packet queue
      *  Dispatcher thread drains queue and exits
      *  ThreadPool processes all submitted tasks and shuts down
-     *
-     * NOTE:
-     *  No packets are dropped
-     *  PipelineController cannot be restarted after stop()
      */
     void stop();
 
