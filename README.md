@@ -1,16 +1,18 @@
 ## PacketScope
 
-A network packet analyzer with a Qt based GUI, designed for real-time packet capture, parsing and inspection.
+A network packet analyzer with a Qt based GUI, designed for real-time packet capture.
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/14c0fe53-28dc-4ab1-9579-c5ca262f60e7" width="45%" />
-  <img src="https://github.com/user-attachments/assets/d445e30f-51ec-4d61-b2e8-2ab80a8d550b" width="45%" />
+  <img src="https://github.com/user-attachments/assets/ba7fead6-e4ae-4944-b42d-dbbfbce020fd" width="45%" />
 </p>
 
 ### Dependencies
 - **Qt6** (6.10.1)
 - **PcapPlusPlus** (25.05)
+- **Spdlog** (1.17.0)
 - **CMake** (3.16 or later)
+- **Doxygen** (Optional for documentation)
 
 ### Building
 
