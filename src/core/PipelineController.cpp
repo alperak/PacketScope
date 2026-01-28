@@ -133,6 +133,7 @@ bool PipelineController::restart() {
 
     // Clear stored packets and reset counters
     packetStore_->clear();
+    packetCapture_->resetCapturedPacketCount();
     rawPacketQueue_.clear();
 
     // Recreate ThreadPool because previous one was shut down
