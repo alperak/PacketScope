@@ -101,10 +101,20 @@ void MainWindow::setupCaptureScreen() {
     mainLayout->setContentsMargins(0, 0, 0, 0);
 
     QToolBar* toolbar = new QToolBar();
-    QAction* stopAction = toolbar->addAction(QStringLiteral("Stop"));
+    toolbar->setMovable(false);
 
-    // Connect stop button to slot
-    connect(stopAction, &QAction::triggered, this, &MainWindow::onStopCapture);
+    startAction_ = toolbar->addAction(QStringLiteral("Start"));
+    stopAction_ = toolbar->addAction(QStringLiteral("Stop"));
+    restartAction_ = toolbar->addAction(QStringLiteral("Restart"));
+
+    // Initial state: all disabled until device is selected
+    startAction_->setEnabled(false);
+    stopAction_->setEnabled(false);
+    restartAction_->setEnabled(false);
+
+    connect(startAction_, &QAction::triggered, this, &MainWindow::onStartCapture);
+    connect(stopAction_, &QAction::triggered, this, &MainWindow::onStopCapture);
+    connect(restartAction_, &QAction::triggered, this, &MainWindow::onRestartCapture);
 
     mainLayout->addWidget(toolbar);
 
@@ -164,31 +174,56 @@ void MainWindow::setupCaptureScreen() {
 }
 
 void MainWindow::onDeviceDoubleClicked(QListWidgetItem* item) {
-    const QString deviceName = item->data(Qt::UserRole).toString();
+    currentDeviceName_ = item->data(Qt::UserRole).toString();
 
-    // Attempt to start capture on selected device
-    if (controller_.start(deviceName.toStdString())) {
-        // Switch to capture screen and start UI updates
+    if (controller_.start(currentDeviceName_.toStdString())) {
+        hasDevice_ = true;
         showCaptureScreen();
         updateTimer_->start(UI_UPDATE_INTERVAL_MS);
-        statusLabel_->setText(QStringLiteral("Capturing on: ") + deviceName);
+        statusLabel_->setText(QStringLiteral("Capturing on: ") + currentDeviceName_);
+        updateButtonStates();
     } else {
-        // Show error dialog
         QMessageBox::warning(this, QStringLiteral("Error"),
-                            QStringLiteral("Failed to start capture on ") + deviceName
-        );
+                            QStringLiteral("Failed to start capture on ") + currentDeviceName_);
     }
 }
 
 void MainWindow::onStopCapture() {
-    // Stop UI update timer
     updateTimer_->stop();
-
-    // Stop packet capture pipeline
     controller_.stop();
+    statusLabel_->setText(QStringLiteral("Capture paused"));
+    updateButtonStates();
+}
 
-    // Update status bar
-    statusLabel_->setText(QStringLiteral("Capture stopped"));
+void MainWindow::onStartCapture() {
+    if (controller_.start(currentDeviceName_.toStdString())) {
+        updateTimer_->start(UI_UPDATE_INTERVAL_MS);
+        statusLabel_->setText(QStringLiteral("Capturing on: ") + currentDeviceName_);
+        updateButtonStates();
+    } else {
+        QMessageBox::warning(this, QStringLiteral("Error"),
+                            QStringLiteral("Failed to resume capture"));
+    }
+}
+
+void MainWindow::onRestartCapture() {
+    if (controller_.restart()) {
+        packetListModel_->reset();
+        updateTimer_->start(UI_UPDATE_INTERVAL_MS);
+        statusLabel_->setText(QStringLiteral("Restarted on: ") + currentDeviceName_);
+        updateButtonStates();
+    } else {
+        QMessageBox::warning(this, QStringLiteral("Error"),
+                            QStringLiteral("Failed to restart capture"));
+    }
+}
+
+void MainWindow::updateButtonStates() {
+    bool isRunning = controller_.isRunning();
+
+    startAction_->setEnabled(!isRunning && hasDevice_);
+    stopAction_->setEnabled(isRunning);
+    restartAction_->setEnabled(hasDevice_);
 }
 
 void MainWindow::showWelcomeScreen() {

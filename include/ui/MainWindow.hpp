@@ -4,15 +4,16 @@
 #include "core/PipelineController.hpp"
 #include "ui/PacketListModel.hpp"
 
-#include <QMainWindow>
+#include <QAction>
+#include <QLabel>
 #include <QListWidget>
-#include <QTableView>
-#include <QTreeWidget>
+#include <QMainWindow>
 #include <QPlainTextEdit>
 #include <QSplitter>
 #include <QStackedWidget>
+#include <QTableView>
 #include <QTimer>
-#include <QLabel>
+#include <QTreeWidget>
 
 /**
  * @brief Main application window for PacketScope network packet analyzer
@@ -46,11 +47,27 @@ private slots:
     void onDeviceDoubleClicked(QListWidgetItem* item);
 
     /**
+     * @brief Resumes packet capture on the current device.
+     *
+     * Called when the Start button is clicked.
+     * Resumes capture from where it was stopped, preserving existing packets.
+     */
+    void onStartCapture();
+
+    /**
      * @brief Handles stop button click in capture screen
      *
      * Stops the packet capture pipeline and UI update timer.
      */
     void onStopCapture();
+
+    /**
+     * @brief Restarts packet capture with a clean slate.
+     *
+     * Called when the Restart button is clicked.
+     * Clears all stored packets and starts fresh capture on the same device.
+     */
+    void onRestartCapture();
 
     /**
      * @brief Periodic UI update handler which called by QTimer
@@ -94,6 +111,16 @@ private:
      * @brief Populates the device list with available interfaces
      */
     void populateDeviceList();
+
+    /**
+     * @brief Updates toolbar button enabled states based on capture status.
+     *
+     * Button states:
+     * - Not started: All disabled
+     * - Running: Stop and Restart enabled, Start disabled
+     * - Stopped: Start and Restart enabled, Stop disabled
+     */
+    void updateButtonStates();
 
     /// UI update interval in milliseconds
     static constexpr int UI_UPDATE_INTERVAL_MS = 100;
@@ -144,6 +171,17 @@ private:
 
     /// Timer for periodic UI updates during capture
     QTimer* updateTimer_;
+
+    // Toolbar actions
+    QAction* startAction_{nullptr};   ///< Start/Resume capture action
+    QAction* stopAction_{nullptr};    ///< Stop/Pause capture action
+    QAction* restartAction_{nullptr}; ///< Restart capture action
+
+    /// Current device name for restart functionality
+    QString currentDeviceName_;
+
+    /// True if a device has been selected (enables restart)
+    bool hasDevice_{false};
 };
 
 #endif // MAINWINDOW_HPP
