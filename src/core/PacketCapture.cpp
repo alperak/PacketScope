@@ -107,3 +107,7 @@ bool PacketCapture::isRunning() const {
 std::size_t PacketCapture::getCapturedPacketCount() const {
     return capturedPacketCount_;
 }
+
+void PacketCapture::resetCapturedPacketCount() {
+    capturedPacketCount_ = 0;
+}
