@@ -25,6 +25,7 @@ std::size_t PacketStore::count() const {
     return parsedPackets_.size();
 }
 
+// The entire vector is being copied. I need to find a more effective way.
 std::vector<packetscope::ParsedPacket> PacketStore::getAllPackets() const {
     std::shared_lock lock(mutex_);
     return parsedPackets_;

@@ -95,6 +95,15 @@ public:
         return queue_.size();
     }
 
+    /**
+     * @brief Clears all elements from the queue.
+     */
+    void clear() {
+        std::lock_guard<std::mutex> lock(mutex_);
+        std::queue<T> empty;
+        std::swap(queue_, empty);
+    }
+
 private:
 
     std::queue<T> queue_;

@@ -8,6 +8,8 @@
 
 #include "ThreadSafeQueue.hpp"
 
+#include <spdlog/spdlog.h>
+
 /**
  * @brief Simple fixed-size thread pool.
  *
@@ -31,6 +33,8 @@ public:
     explicit ThreadPool(std::size_t threadCount) {
         const std::size_t count = std::max(threadCount, std::size_t{1});
         workers_.reserve(count);
+
+        spdlog::debug("ThreadPool::ThreadPool() - Creating {} worker threads", count);
 
         for (std::size_t i = 0; i < count; ++i) {
             workers_.emplace_back([this] { workerLoop(); });
@@ -92,24 +96,43 @@ public:
         joinAll();
     }
 
+    /**
+     * @brief Checks if the thread pool has been shut down.
+     * @return true if shutdown() was called, false otherwise
+     */
+    bool isStopped() const {
+        return stopped_;
+    }
+
 private:
 
     /**
      * @brief Worker thread main loop.
      *
      * Continuously pops tasks from the queue and executes them.
-     * Receiving an empty std::function acts as a shutdown signal.
+     * Exits when poison pill (empty function) is received.
+     * Catches all exceptions thrown by tasks are caught to prevent
+     * worker thread termination and crash.
      */
     void workerLoop() {
         while (true) {
             std::function<void()> task = tasks_.pop();
 
-            // Poison pill: empty function means exit
+            // Check for poison pill (empty function = shutdown signal)
             if (!task) {
+                spdlog::debug("ThreadPool::workerLoop() - Worker thread exiting");
                 return;
             }
 
-            task();
+            try {
+                task();
+            } catch (const std::exception& e) {
+                // Catch standard exceptions
+                spdlog::error("ThreadPool::workerLoop() - Task exception: {}", e.what());
+            } catch (...) {
+                // Catch all other exceptions
+                spdlog::error("ThreadPool::workerLoop() - Task unknown exception");
+            }
         }
     }
 

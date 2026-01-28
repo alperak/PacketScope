@@ -6,6 +6,8 @@
 #include "ThreadPool.hpp"
 #include "PacketProcessor.hpp"
 
+#include <mutex>
+
 /**
  * @brief Coordinates the entire packet processing pipeline.
  *
@@ -23,30 +25,36 @@ public:
     PipelineController& operator=(PipelineController&&) = delete;
 
     /**
-     * @brief Starts the capture pipeline on the specified device.
+     * @brief Starts or resumes the capture pipeline.
      *
-     * This function can be called only once during the lifetime
-     * of PipelineController. Restarting after stop() isn't supported
-     * at the moment.
+     * If called after stop(), resumes capture on the specified device.
+     * Existing packets in store are preserved.
      *
-     * @param deviceName Network device name ("eth0", "wlan0", etc.)
+     * @param deviceName Network device name (eth0, wlan0, etc.)
      */
     bool start(const std::string& deviceName);
 
     /**
-     * @brief Stops the capture pipeline gracefully.
+     * @brief Pauses the capture pipeline.
+     *
+     * Stops capturing new packets. Existing packets remain in store.
+     * Can be resumed with start().
      *
      * Shutdown sequence:
      *  Stop packet capture (no new packets produced)
      *  Push poison pill (std::nullopt) to raw packet queue
      *  Dispatcher thread drains queue and exits
      *  ThreadPool processes all submitted tasks and shuts down
-     *
-     * NOTE:
-     *  No packets are dropped
-     *  PipelineController cannot be restarted after stop()
      */
     void stop();
+
+    /**
+     * @brief Restarts the pipeline on the current device.
+     *
+     * Clears all stored packets and statistics, then starts
+     * fresh capture on the same device.
+     */
+    bool restart();
 
     /**
      * @brief Checks if pipeline is currently running.
@@ -117,8 +125,14 @@ private:
     // PipelineController state flag
     std::atomic<bool> isRunning_{false};
 
+    // Mutex for start/stop coordination
+    std::mutex controlMutex_;
+
     // Worker thread count
     static constexpr std::size_t kWorkerCount = 2;
+
+    // Current device name (for restart)
+    std::string currentDeviceName_;
 };
 
 #endif

@@ -66,6 +66,11 @@ public:
      */
     std::size_t getCapturedPacketCount() const;
 
+    /**
+     * @brief Resets captured packet count
+     */
+    void resetCapturedPacketCount();
+
 private:
     /**
      * @brief Internal callback invoked by PcapPlusPlus for each captured packet.
